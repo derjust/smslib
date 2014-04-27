@@ -31,7 +31,7 @@ public class MessageReader extends Thread
 {
 	static Logger logger = LoggerFactory.getLogger(MessageReader.class);
 
-	Modem modem;
+	final  Modem modem;
 
 	boolean shouldCancel = false;
 
@@ -66,7 +66,7 @@ public class MessageReader extends Thread
 							{
 								ArrayList<InboundMessage> messageList = (this.modem.getDeviceInformation().getMode() == Modes.PDU ? parsePDU(data, memLocation) : parseTEXT(data, memLocation));
 								for (InboundMessage message : messageList)
-									processMessage(message);
+									modem.processMessage(message);
 							}
 						}
 					}
@@ -382,18 +382,6 @@ public class MessageReader extends Thread
 					//
 				}
 			}
-		}
-	}
-
-	private void processMessage(InboundMessage message)
-	{
-		String messageSignature = message.getSignature();
-		if (!this.modem.getReadMessagesSet().contains(messageSignature))
-		{
-			this.modem.getStatistics().increaseTotalReceived();
-			if (message instanceof DeliveryReportMessage)Service.getInstance().getCallbackManager().registerDeliveryReportEvent((DeliveryReportMessage) message);
-			else Service.getInstance().getCallbackManager().registerInboundMessageEvent(message);
-			this.modem.getReadMessagesSet().add(messageSignature);
 		}
 	}
 }
