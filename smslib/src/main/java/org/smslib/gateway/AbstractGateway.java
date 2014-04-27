@@ -1,8 +1,11 @@
 
 package org.smslib.gateway;
 
+import java.util.HashSet;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.Semaphore;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.smslib.Service;
@@ -11,6 +14,7 @@ import org.smslib.core.Coverage;
 import org.smslib.core.CreditBalance;
 import org.smslib.core.Statistics;
 import org.smslib.message.DeliveryReportMessage.DeliveryStatus;
+import org.smslib.message.DeliveryReportMessage;
 import org.smslib.message.InboundMessage;
 import org.smslib.message.MsIsdn;
 import org.smslib.message.OutboundMessage;
@@ -61,20 +65,20 @@ public abstract class AbstractGateway
 
 	Random randomizer = new Random();
 
+	Set<String> readMessagesSet;
+	
 	public AbstractGateway(int noOfDispatchers, int concurrencyLevel, String id, String description)
 	{
 		this.gatewayMessageDispatchers = new GatewayMessageDispatcher[noOfDispatchers];
 		this.concurrency = new Semaphore(concurrencyLevel, true);
+		this.readMessagesSet = new HashSet<>();
 		setGatewayId(id);
 		setDescription(description);
 	}
 
 	public AbstractGateway(int concurrencyLevel, String id, String description)
 	{
-		this.gatewayMessageDispatchers = new GatewayMessageDispatcher[concurrencyLevel - 1];
-		this.concurrency = new Semaphore(concurrencyLevel, true);
-		setGatewayId(id);
-		setDescription(description);
+		this(concurrencyLevel-1, concurrencyLevel, id, description);
 	}
 
 	public Status getStatus()
@@ -424,4 +428,33 @@ public abstract class AbstractGateway
 		b.append("== GATEWAY END ========================================================================\n");
 		return b.toString();
 	}
+	
+
+	/**
+	 * Should only be called by gateway implementations!
+	 * This method also updates the statistics accordingly
+	 */
+	public void processMessage(InboundMessage message)
+	{
+		String messageSignature = message.getSignature();
+		if (!this.getReadMessagesSet().contains(messageSignature))
+		{
+			this.getStatistics().increaseTotalReceived();
+			if (message instanceof DeliveryReportMessage)
+			{
+				Service.getInstance().getCallbackManager().registerDeliveryReportEvent((DeliveryReportMessage) message);
+			}
+			else
+			{
+				Service.getInstance().getCallbackManager().registerInboundMessageEvent(message);
+			}
+			this.getReadMessagesSet().add(messageSignature);
+		}
+	}
+
+	protected Set<String> getReadMessagesSet()
+	{
+		return this.readMessagesSet;
+	}
+	
 }

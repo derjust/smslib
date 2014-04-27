@@ -4,7 +4,6 @@ package org.smslib.gateway.modem;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.StringTokenizer;
 import org.slf4j.Logger;
@@ -43,8 +42,6 @@ public class Modem extends AbstractGateway
 
 	MessageReader messageReader;
 
-	HashSet<String> readMessagesSet;
-
 	public Modem(String gatewayId, String address, int port, String simPin, String simPin2, MsIsdn smscNumber, String memoryLocations)
 	{
 		super(2, gatewayId, "GSM Modem");
@@ -64,7 +61,6 @@ public class Modem extends AbstractGateway
 		this.simPin = simPin;
 		this.simPin2 = simPin2;
 		this.smscNumber = (smscNumber == null ? new MsIsdn() : smscNumber);
-		this.readMessagesSet = new HashSet<>();
 	}
 
 	public Modem(String gatewayId, String... parms)
@@ -128,11 +124,6 @@ public class Modem extends AbstractGateway
 	public void setSmscNumber(MsIsdn smscNumber)
 	{
 		this.smscNumber = smscNumber;
-	}
-
-	public HashSet<String> getReadMessagesSet()
-	{
-		return this.readMessagesSet;
 	}
 
 	public void refreshDeviceInfo() throws Exception
@@ -218,7 +209,7 @@ public class Modem extends AbstractGateway
 	{
 		synchronized (this.modemDriver._LOCK_)
 		{
-			this.readMessagesSet.remove(message.getSignature());
+			getReadMessagesSet().remove(message.getSignature());
 			if (message.getMemIndex() >= 0) { return this.modemDriver.atDeleteMessage(message.getMemLocation(), message.getMemIndex()).isResponseOk(); }
 			if ((message.getMemIndex() == -1) && (message.getMpMemIndex().length() > 0))
 			{
