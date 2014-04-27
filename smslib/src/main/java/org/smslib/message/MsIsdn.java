@@ -3,6 +3,10 @@ package org.smslib.message;
 
 import org.smslib.helper.Common;
 
+/**
+ * Represents a number usually associated with a message. 
+ * An instance has always a not-null address and type 
+ */
 public class MsIsdn
 {
 	public enum Type
@@ -10,9 +14,9 @@ public class MsIsdn
 		National, International, Text, Void
 	}
 
-	String address = null;
+	final String address;
 
-	Type type = Type.International;
+	final Type type;
 
 	public MsIsdn()
 	{
@@ -45,21 +49,34 @@ public class MsIsdn
 		this.address = msisdn.getAddress();
 	}
 
+	/**
+	 * @return The addresss of this ISDN
+	 */
 	public String getAddress()
 	{
 		return this.address;
 	}
 
+	/**
+	 * @return The type of this ISDN
+	 */
 	public Type getType()
 	{
 		return this.type;
 	}
 
+	/**
+	 * @return True if {@link #getType()} equals {@link Type#Void}. Otherwise false
+	 */
 	public boolean isVoid()
 	{
 		return (this.type == Type.Void);
 	}
 
+	/**
+	 * Two instances of MsIsdn are equals if they are ignore-case equal address
+	 * @see MsIsdn#getAddress()
+	 */
 	@Override
 	public boolean equals(Object o)
 	{
