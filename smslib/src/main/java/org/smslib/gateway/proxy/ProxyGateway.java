@@ -16,9 +16,6 @@ import org.smslib.message.DeliveryReportMessage.DeliveryStatus;
 import org.smslib.message.InboundMessage;
 import org.smslib.message.OutboundMessage;
 
-import com.sun.net.httpserver.HttpServer;
-
-@SuppressWarnings("restriction")
 public class ProxyGateway extends AbstractGateway {
 	public static final String SCHEMA = "http";
 	public static final String CONTEXT = "/proxygateway";
@@ -27,13 +24,29 @@ public class ProxyGateway extends AbstractGateway {
 	
 	final URI uri;
 	final ResourceConfig config;
-	HttpServer server;
+	@SuppressWarnings("restriction")
+	com.sun.net.httpserver.HttpServer server;
 	
-	public ProxyGateway(String gatewayId, String host, int port) {
+	public ProxyGateway(String gatewayId, String host, int port, String token) {
 		super(2, gatewayId, "Proxy Gateway");
 		// Just inbound messages - this is also the default
 		//setCapabilities(new Capabilities());
 
+		try
+		{
+			uri = new URI(SCHEMA, "", host, port, CONTEXT, "", "");
+			//Provide feedback to the user
+			logger.info("Started proxy gateway at {}//{}:{}", 
+					SCHEMA,
+					uri.getHost(),
+					uri.getPort()
+					);
+		}
+		catch (URISyntaxException e)
+		{
+			throw new IllegalArgumentException(e.getMessage(), e);
+		} 
+		
 		//Register endpoints
 		config = new ResourceConfig(MessagesEndpoint.class, VersionEndpoint.class);
 		//Register binding to this proxy gateway from the endpoints
@@ -45,34 +58,29 @@ public class ProxyGateway extends AbstractGateway {
                 bindFactory(new ProxyGatewayFactory(ProxyGateway.this)).to(ProxyGateway.class);
             }
         });
-		 config .register(MoxyJsonFeature.class);
-	     config.register(JsonMoxyConfigurationContextResolver.class);
+		config.register(MoxyJsonFeature.class);
+	    config.register(JsonMoxyConfigurationContextResolver.class);
+	     
+	    if (token != null && token.length() > 0)
+	    {
+	    	logger.info("Authorization token '{}' activated", token);
+	    	config.register(new SecurityFilter(token));
+	    }
 		
-		try {
-			uri = new URI(SCHEMA, "", host, port, CONTEXT, "", "");
-		} catch (URISyntaxException e) {
-			throw new IllegalArgumentException(e.getMessage(), e);
-		} 
 	}
 
 	public ProxyGateway(String gatewayId, String... parms)
 	{
-		this(gatewayId, parms[0], Integer.parseInt(parms[1]));
+		this(gatewayId, parms[0], Integer.parseInt(parms[1]), parms.length >= 2 ? parms[2]: null);
 	}
 	
 	@Override
 	protected void _start() throws Exception {
 		//Create and start the server
 		server = JdkHttpServerFactory.createHttpServer(uri, config);
-
-		//Provide feedback to the user
-		logger.info("Started proxy gateway at {}//{}:{}", 
-				SCHEMA,
-				uri.getHost(),
-				uri.getPort()
-				);
 	}
 
+	@SuppressWarnings("restriction")
 	@Override
 	protected void _stop() throws Exception {
 		server.stop(0);

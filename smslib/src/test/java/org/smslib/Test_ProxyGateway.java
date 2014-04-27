@@ -40,7 +40,7 @@ public class Test_ProxyGateway extends TestCase {
 		
 		String ip = InetAddress.getLoopbackAddress().getHostAddress();
 		logger.info("Debugging with {}", ip);
-		ProxyGateway gateway = new ProxyGateway("proxy", "192.168.152.135", 9999);
+		ProxyGateway gateway = new ProxyGateway("proxy", "192.168.152.135", 9999, "ab");
 		Service.getInstance().registerGateway(gateway);
 
 		// Sleep to wait
