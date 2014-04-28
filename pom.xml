@@ -6,6 +6,7 @@
 		<junit.version>4.11</junit.version>
 		<slf4j-api.version>1.7.2</slf4j-api.version>
 		<slf4j-log4j12.version>1.7.2</slf4j-log4j12.version>
+		<slf4j-jul.version>1.7.2</slf4j-jul.version>
 		<log4j.version>1.2.17</log4j.version>
 		<simple.version>5.1.6</simple.version>
 		<mysql.version>5.1.29</mysql.version>
