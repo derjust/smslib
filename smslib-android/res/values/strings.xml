@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">SMSLib Proxy Gateway</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_refresh">Refresh</string>
+
+    <string name="statistics_header">Gateway Statistics</string>
+    <string name="statistics_number_default">-</string>
+    
+    <string name="prefHostSummary">The host</string>
+    <string name="prefPortSummary">Default port is 9999</string>
+    <string name="prefAuthTokenSummary">Might be empty</string>
+    
+</resources>
