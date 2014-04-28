@@ -57,7 +57,7 @@ public class ProxyGateway extends AbstractGateway {
 		 SLF4JBridgeHandler.install();
 		
 		//Register endpoints
-		config = new ResourceConfig(MessagesEndpoint.class, VersionEndpoint.class);
+		config = new ResourceConfig(MessagesEndpoint.class, VersionEndpoint.class, StatusEndpoint.class);
 
 		//Register binding to this proxy gateway for the endpoints
 		config.register(new AbstractBinder()
