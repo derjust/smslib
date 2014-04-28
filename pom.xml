@@ -43,7 +43,7 @@
 		</developer>
 		<developer>
 			<name>Sebastian Just</name>
-			<email></email>
+			<email>zeeman@zeeman.de</email>
 			<roles>
 				<role>Contributor</role>
 			</roles>
@@ -72,6 +72,7 @@
 	<modules>
 		<module>smslib</module>
 		<module>smslib-camel</module>
+		<module>smslib-android</module>
 		<module>smslib-dep</module>
 		<module>smslib-dotnet</module>
 		<module>smsserver</module>

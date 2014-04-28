@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <artifactId>smslib-parent</artifactId>
+    <groupId>org.smslib</groupId>
+    <version>dev-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>smslib-android</artifactId>
+  <packaging>pom</packaging>
+  <name>SMSLib - Android Proxy Gateway App</name>
+  <description>App to be installed on Android phones to leverage SMSLib's Proxy Gateway</description>
+
+  <developers>
+    <developer>
+      <name>Thanasis Delenikas</name>
+      <email>admin@smslib.org</email>
+      <roles>
+        <role>Author</role>
+      </roles>
+    </developer>
+    <developer>
+      <name>Sebastian Just</name>
+      <email>zeeman@zeeman.de</email>
+      <roles>
+        <role>Author</role>
+      </roles>
+    </developer>
+  </developers>
+
+  <dependencies>
+
+  
+  </dependencies>
+
+  <build>
+  
+
+  </build>
+
+</project>
