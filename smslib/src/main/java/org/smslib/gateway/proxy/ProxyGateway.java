@@ -37,7 +37,7 @@ public class ProxyGateway extends AbstractGateway {
 		{
 			uri = new URI(SCHEMA, "", host, port, CONTEXT, "", "");
 			//Provide feedback to the user
-			logger.info("Started proxy gateway at {}//{}:{}", 
+			logger.info("Started proxy gateway at {}://{}:{}", 
 					SCHEMA,
 					uri.getHost(),
 					uri.getPort()
