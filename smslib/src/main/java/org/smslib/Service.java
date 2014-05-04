@@ -127,7 +127,7 @@ public class Service
 		try
 		{
 			Settings.loadSettings();
-			this.httpServer.start(new InetSocketAddress(Settings.httpServerPort), Settings.httpServerPoolSize);
+			this.httpServer.start(new InetSocketAddress(Settings.httpServerPort), Settings.httpServerPoolSize, Settings.httpUseSsl);
 			getCallbackManager().start();
 		}
 		catch (Exception e)

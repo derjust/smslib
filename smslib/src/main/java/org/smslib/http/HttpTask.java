@@ -57,7 +57,11 @@ public class HttpTask implements Runnable
 					Status s = h.process(request, response);
 					response.setStatus(s);
 				}
-				else response.setStatus(Status.FORBIDDEN);
+				else 
+				{
+					logger.warn("No access to {} from {}", path, ip);
+					response.setStatus(Status.FORBIDDEN);
+				}
 			}
 			else response.setStatus(Status.NOT_FOUND);
 			response.close();
