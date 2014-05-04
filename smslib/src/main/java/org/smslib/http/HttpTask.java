@@ -55,7 +55,7 @@ public class HttpTask implements Runnable
 				if (accessOk)
 				{
 					Status s = h.process(request, response);
-					response.setStatus(s);
+					if (s != null) response.setStatus(s);
 				}
 				else 
 				{

@@ -2,7 +2,6 @@
 package org.smslib.http;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -19,7 +18,6 @@ import java.security.SecureRandom;
 import java.security.Security;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -29,10 +27,8 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 
 import org.bouncycastle.jce.X509Principal;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -47,6 +43,7 @@ import org.simpleframework.transport.connect.SocketConnection;
 import org.simpleframework.transport.trace.Agent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.smslib.gateway.proxy.ProxyGateway;
 import org.smslib.http.handlers.StatusHandler;
 import org.smslib.http.logging.LoggingFactoryAgent;
 
@@ -62,12 +59,10 @@ public class HttpServer implements Container
 
 	static Executor executor;
 
-	Container container;
-
 	Connection connection;
 
 	Server server;
-
+	
 	public HttpServer()
 	{
 		HttpServer.httpRequestHandlers.put("/status", new StatusHandler());
@@ -76,8 +71,7 @@ public class HttpServer implements Container
 	public void start(InetSocketAddress bindAddress, int poolSize, boolean useSsl) throws Exception
 	{
 		executor = Executors.newFixedThreadPool(poolSize);
-		container = new HttpServer();
-		server = new ContainerServer(container);
+		server = new ContainerServer(this);
 		connection = new SocketConnection(server, getAgent());
 		SocketAddress address = bindAddress;
 		connection.connect(address, getSSLContext(useSsl, bindAddress));
@@ -97,7 +91,8 @@ public class HttpServer implements Container
 		}
 	}
 
-	private Agent getAgent() {
+	private Agent getAgent()
+	{
 		if (logger.isDebugEnabled())
 		{
 			return new LoggingFactoryAgent(logger);

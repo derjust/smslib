@@ -1,53 +1,40 @@
 package org.smslib.gateway.proxy;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import java.io.IOException;
 
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.jdkhttp.JdkHttpServerFactory;
 import org.glassfish.jersey.moxy.json.MoxyJsonFeature;
+import org.glassfish.jersey.server.ContainerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
-import org.slf4j.Logger; 
+import org.glassfish.jersey.simple.SimpleContainer;
+import org.simpleframework.http.Request;
+import org.simpleframework.http.Response;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.smslib.Service;
 import org.smslib.core.Coverage;
 import org.smslib.core.CreditBalance;
 import org.smslib.gateway.AbstractGateway;
+import org.smslib.http.IHttpRequestHandler;
 import org.smslib.message.DeliveryReportMessage.DeliveryStatus;
 import org.smslib.message.InboundMessage;
 import org.smslib.message.OutboundMessage;
 
 public class ProxyGateway extends AbstractGateway {
-	public static final String SCHEMA = "http";
+	public static final String SCHEMA = "https";
 	public static final String CONTEXT = "/proxygateway";
 	
 	static final Logger logger = LoggerFactory.getLogger(ProxyGateway.class);
 	
-	final URI uri;
 	final ResourceConfig config;
-	@SuppressWarnings("restriction")
-	com.sun.net.httpserver.HttpServer server;
+	private IHttpRequestHandler handler;
 	
-	public ProxyGateway(String gatewayId, String host, int port, String token) {
+	public ProxyGateway(String gatewayId, String token) {
 		super(2, gatewayId, "Proxy Gateway");
 		// Just inbound messages - this is also the default
 		//setCapabilities(new Capabilities());
 
-		try
-		{
-			uri = new URI(SCHEMA, "", host, port, CONTEXT, "", "");
-			//Provide feedback to the user
-			logger.info("Started proxy gateway at {}://{}:{}", 
-					SCHEMA,
-					uri.getHost(),
-					uri.getPort()
-					);
-		}
-		catch (URISyntaxException e)
-		{
-			throw new IllegalArgumentException(e.getMessage(), e);
-		} 
-		
 		//Redirect Jersey's logging - levels must still be specified via jul's logging.properties!
 		// Optionally remove existing handlers attached to j.u.l root logger
 		 SLF4JBridgeHandler.removeHandlersForRootLogger();  // (since SLF4J 1.6.5)
@@ -83,19 +70,28 @@ public class ProxyGateway extends AbstractGateway {
 
 	public ProxyGateway(String gatewayId, String... parms)
 	{
-		this(gatewayId, parms[0], Integer.parseInt(parms[1]), parms.length >= 2 ? parms[2] : null);
+		this(gatewayId, parms.length >= 1 ? parms[0] : null);
 	}
 	
 	@Override
 	protected void _start() throws Exception {
-		//Create and start the server
-		server = JdkHttpServerFactory.createHttpServer(uri, config);
+        
+        handler = new IHttpRequestHandler() {
+        	SimpleContainer container = ContainerFactory.createContainer(SimpleContainer.class, config);
+			
+			@Override
+			public org.simpleframework.http.Status process(Request request, Response response) {
+				container.handle(request, response);
+				return null;
+			}
+		};
+
+		Service.getInstance().registerHttpRequestHandler("/messages", handler);
 	}
 
-	@SuppressWarnings("restriction")
 	@Override
-	protected void _stop() throws Exception {
-		server.stop(0);
+	protected void _stop() throws IOException {
+		//TODO
 	}
 
 	@Override

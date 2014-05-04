@@ -15,7 +15,7 @@ public class ProxyGatewayFactory implements Factory<ProxyGateway> {
 	}
 	
 	@Override
-	public void dispose(ProxyGateway arg0) {
+	public void dispose(ProxyGateway notused) {
 	}
 
 	@Override
